@@ -867,7 +867,7 @@ function HandheldRunner(cart) {
                             e.preventDefault();
                             return false;
                         }
-                        button.node.ontouchend=function() {
+                        button.node.ontouchend=function(e) {
                             setButtonState(this._button,0);
                             e.preventDefault();
                             return false;
