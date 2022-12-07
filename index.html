@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+    <head>
+        <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>LCD Game - World Changers</title>
+        <link rel="stylesheet" href="js/handheld.css">
+        <script src="js/handheld.js"></script>
+        <script src="carts/worldchangers/cart.js"></script>
+    </head>
+    <body onload="onl()">
+        <div id="background">
+            <span id="svg" class="prevent-select"></span>
+            <span id="displaysvg"></span>
+        </div>
+    </body>
+    <script>
+
+        function onl() {
+
+            let
+                cart=new HandheldRunner(CART_WORLDCHANGERS);
+                cart.run();
+
+        }
+
+    </script>
+</html>

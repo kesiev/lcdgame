@@ -1,0 +1,21 @@
+HTML,BODY {
+    padding:0;
+    margin:0;
+    overflow: hidden;
+    width:100%;
+    height:100%;
+}
+
+.prevent-select {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
+
+#background {
+    position: absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom: 0;
+}
