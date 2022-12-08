@@ -23,58 +23,58 @@ function HandheldRunner(cart) {
         BUTTONS={
             up:{
                 id:"buttonup",
-                keyCode:38,
+                keyCodes:[38],
                 labelsId:["buttonUpLabel"]
             },
             down:{
                 id:"buttondown",
-                keyCode:40,
+                keyCodes:[40],
                 labelsId:["buttonDownLabel"]
             },
             left:{
                 id:"buttonleft",
-                keyCode:37,
+                keyCodes:[37],
                 labelsId:["buttonLeftLabel"]
             },
             right:{
                 id:"buttonright",
-                keyCode:39,
+                keyCodes:[39],
                 labelsId:["buttonRightLabel"]
             },
             A:{
                 id:"buttonA",
                 labelsId:["buttonAlabel"],
-                keyCode:90
+                keyCodes:[90,89,81]
             },
             B:{
                 id:"buttonB",
                 labelsId:["buttonBlabel"],
-                keyCode:88
+                keyCodes:[88,74,86,83]
             },
             button1:{
                 id:"button1",
                 labelsId:["button1up","button1down"],
-                keyCode:49
+                keyCodes:[49]
             },
             button2:{
                 id:"button2",
                 labelsId:["button2up","button2down"],
-                keyCode:50
+                keyCodes:[50]
             },
             button3:{
                 id:"button3",
                 labelsId:["button3up","button3down"],
-                keyCode:51
+                keyCodes:[51]
             },
             button4:{
                 id:"button4",
                 labelsId:["button4up","button4down"],
-                keyCode:52
+                keyCodes:[52]
             },
             ACL:{
                 id:"buttonACL",
                 labelsId:["buttonACLup","buttonACLdown"],
-                keyCode:53
+                keyCodes:[53]
             }
         };
 
@@ -800,14 +800,13 @@ function HandheldRunner(cart) {
 
                     document.body.onkeydown=(e)=>{
                         audioInitialize();
-
                         if (e.keyCode == 70)
                             setFullScreen();
                         else {
 
                             let hit=false;
                             for (var b in BUTTONS)
-                                if (e.keyCode == BUTTONS[b].keyCode) {
+                                if (BUTTONS[b].keyCodes.indexOf(e.keyCode) != -1) {
                                     hit=true;
                                     setButtonState(b,1);
                                     dismissHelp();
@@ -824,7 +823,7 @@ function HandheldRunner(cart) {
                     document.body.onkeyup=(e)=>{
                         let hit=false;
                         for (var b in BUTTONS)
-                            if (e.keyCode == BUTTONS[b].keyCode) {
+                            if (BUTTONS[b].keyCodes.indexOf(e.keyCode) != -1) {
                                 hit=true;
                                 setButtonState(b,0);
                             }
