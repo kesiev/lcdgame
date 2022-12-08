@@ -24,8 +24,8 @@ Take down enemy soldiers and huge tanks, collect diamonds and bring *peace* to E
 
    - Hit F or click/touch the game display to fullscreen the game
    - Use the arrow keys or click/touch the arrow controls to move your soldier
-   - Hit Z or click/touch the FIRE button to fire
-   - Hit X or click/touch the RELOAD button
+   - Hit Z/Y/Q or click/touch the FIRE button to fire
+   - Hit X/J/V/S or click/touch the RELOAD button
      - Hit the RELOAD button again when the arrows are aligned with the top of the bar for a perfect reload!
    - Eliminate the required amount of enemies in time or... game over!
    - You can hide behind the walls on the bottom of the screen...
