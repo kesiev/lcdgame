@@ -24,37 +24,44 @@ function HandheldRunner(cart) {
             up:{
                 id:"buttonup",
                 keyCodes:[38],
-                labelsId:["buttonUpLabel"]
+                labelsId:["buttonUpLabel"],
+                gamepad:{id:0, button:12, axisLesser:1, axisSensitivity:1}
             },
             down:{
                 id:"buttondown",
                 keyCodes:[40],
-                labelsId:["buttonDownLabel"]
+                labelsId:["buttonDownLabel"],
+                gamepad:{id:0, button:13, axisGreater:1, axisSensitivity:1}
             },
             left:{
                 id:"buttonleft",
                 keyCodes:[37],
-                labelsId:["buttonLeftLabel"]
+                labelsId:["buttonLeftLabel"],
+                gamepad:{id:0, button:14, axisLesser:0, axisSensitivity:1}
             },
             right:{
                 id:"buttonright",
                 keyCodes:[39],
-                labelsId:["buttonRightLabel"]
+                labelsId:["buttonRightLabel"],
+                gamepad:{id:0, button:15, axisGreater:0, axisSensitivity:1}
             },
             A:{
                 id:"buttonA",
                 labelsId:["buttonAlabel"],
-                keyCodes:[90,89,81]
+                keyCodes:[90,89,81],
+                gamepad:{id:0, button:0, altButton:3 }
             },
             B:{
                 id:"buttonB",
                 labelsId:["buttonBlabel"],
-                keyCodes:[88,74,86,83]
+                keyCodes:[88,74,86,83],
+                gamepad:{id:0, button:2, altButton:1, alt2Button:5 }
             },
             button1:{
                 id:"button1",
                 labelsId:["button1up","button1down"],
-                keyCodes:[49]
+                keyCodes:[49],
+                gamepad:{id:0, button:8 }
             },
             button2:{
                 id:"button2",
@@ -64,12 +71,14 @@ function HandheldRunner(cart) {
             button3:{
                 id:"button3",
                 labelsId:["button3up","button3down"],
-                keyCodes:[51]
+                keyCodes:[51],
+                gamepad:{id:0, button:9 }
             },
             button4:{
                 id:"button4",
                 labelsId:["button4up","button4down"],
-                keyCodes:[52]
+                keyCodes:[52],
+                gamepad:{id:0, button:9, altButton:8 }
             },
             ACL:{
                 id:"buttonACL",
@@ -195,29 +204,59 @@ function HandheldRunner(cart) {
     // Button states
 
     let setButtonState=(id,state)=>{
-        if (BUTTONS[id].state!=state) {
-            BUTTONS[id].state=state;
-            BUTTONS[id].node.setAttribute("style",state?BUTTONONSTYLE:BUTTONOFFSTYLE);
-        }
+        BUTTONS[id].state=state;
+    };
+
+    let drawButtonState=(id,state)=>{
+        BUTTONS[id].node.setAttribute("style",state?BUTTONONSTYLE:BUTTONOFFSTYLE);
     };
 
     this.controls={};
 
     let updateControls = ()=>{
 
+        let pluggedGamepads;
+        if (useGamepads) pluggedGamepads=navigator.getGamepads();
+
         for (let b in BUTTONS) {
 
-            let subcontrol=this.controls[b];
+            let
+                subcontrol=this.controls[b],
+                key=BUTTONS[b],
+                down=key.state;
+            
+            if (useGamepads && key.gamepad) {
+                let
+                    padkey=key.gamepad,
+                    gamepad=pluggedGamepads[padkey.id];
+                if (gamepad) {
+                    if (padkey.button !== undefined)
+                        down|=padButtonIsPressed(gamepad.buttons[padkey.button]);
+                    if (padkey.altButton !== undefined)
+                        down|=padButtonIsPressed(gamepad.buttons[padkey.altButton]);
+                    if (padkey.alt2Button !== undefined)
+                        down|=padButtonIsPressed(gamepad.buttons[padkey.alt2Button]);
+                    if (padkey.buttonAxis !== undefined)
+                        down|=gamepad.axes[padkey.buttonAxis]?gamepad.axes[padkey.buttonAxis]*padkey.axisSensitivity>0.7:0;
+                    if (padkey.axisGreater !== undefined)
+                        down|=gamepad.axes[padkey.axisGreater]?gamepad.axes[padkey.axisGreater]*padkey.axisSensitivity>0.7:0;
+                    if (padkey.axisLesser !== undefined)
+                        down|=gamepad.axes[padkey.axisLesser]?gamepad.axes[padkey.axisLesser]*padkey.axisSensitivity<-0.7:0;
+                }
+            }
 
-            if (BUTTONS[b].state) {
-                if (!subcontrol || (subcontrol<0))
+            if (down) {
+                if (!subcontrol || (subcontrol<0)) {
+                    dismissHelp();
+                    drawButtonState(b,1);
                     this.controls[b]=1;
-                else
+                } else
                     this.controls[b]++;
             } else {
-                if (subcontrol > 0)
+                if (subcontrol > 0) {
+                    drawButtonState(b,0);
                     this.controls[b] = -1;
-                else if (subcontrol == -1)
+                } else if (subcontrol == -1)
                     this.controls[b] = 0;
             }
 
@@ -232,6 +271,17 @@ function HandheldRunner(cart) {
     this.controlIsUp = (control)=>{ return control < 1; }
 
     this.controlIsReleased = (control)=>{ return control == -1; }
+
+    // Gamepad
+
+    let
+        gamepadPressedMode,
+        useGamepads=false;
+
+    let padButtonIsPressed=(b)=>{
+		if (gamepadPressedMode) return b?Math.abs(b.value)>0.7:0;
+		else return b==1.0;
+	}
 
     // Resource loading
 
@@ -809,7 +859,6 @@ function HandheldRunner(cart) {
                                 if (BUTTONS[b].keyCodes.indexOf(e.keyCode) != -1) {
                                     hit=true;
                                     setButtonState(b,1);
-                                    dismissHelp();
                                 }
 
                             if (hit) {
@@ -848,7 +897,6 @@ function HandheldRunner(cart) {
                             })
                         }
                         button.node.onmousedown=function(e) {
-                            dismissHelp();
                             audioInitialize();
                             setButtonState(this._button,1);
                             e.preventDefault();
@@ -860,7 +908,6 @@ function HandheldRunner(cart) {
                             return false;
                         }
                         button.node.ontouchstart=function(e) {
-                            dismissHelp();
                             audioInitialize();
                             setButtonState(this._button,1);
                             e.preventDefault();
@@ -872,7 +919,16 @@ function HandheldRunner(cart) {
                             return false;
                         }
                         setButtonState(b,0);
+                        drawButtonState(b,0);
                     }
+
+                    // Gamepad
+
+                    window.addEventListener("gamepadconnected", (e) => {
+                        audioInitialize();
+                        useGamepads=true;
+                        if (e.gamepad.buttons[0]) gamepadPressedMode=typeof e.gamepad.buttons[0]=="object";
+                    });
 
                     // Fullscreen callback
 
@@ -880,13 +936,11 @@ function HandheldRunner(cart) {
                     fullscreen.style.opacity=0;
 
                     fullscreen.onmousedown=function(e) {
-                        dismissHelp();
                         audioInitialize();
                         setFullScreen();
                         return false;
                     }
                     fullscreen.ontouchstart=function(e) {
-                        dismissHelp();
                         audioInitialize();
                         setFullScreen();
                         e.preventDefault();
