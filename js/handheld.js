@@ -87,6 +87,9 @@ function HandheldRunner(cart) {
             }
         };
 
+    // Feature detection
+    this.isWakeLock='wakeLock' in navigator;
+
     // Game cycle
 
     this.FPS = cart.fps;
@@ -162,6 +165,40 @@ function HandheldRunner(cart) {
             if (this.state && this.state.onEnter)
                 this.state.onEnter(this,this.state);
         }
+    }
+
+    // Wakelock
+    
+    let wakelock;
+    
+    let getWakeLock=async()=>{
+        if (this.isWakeLock && !wakelock) {
+            try {
+                wakelock = await navigator.wakeLock.request('screen');
+            } catch (err) {
+                wakelock=0;
+            }
+        }
+    }
+
+    let releaseWakeLock=async()=> {
+        if (this.isWakeLock && wakelock) {
+            wakelock.release();
+            wakelock=0;
+        }
+    }
+
+    function onVisibilityChange() {
+        switch (document.visibilityState) {
+            case "visible":{
+                getWakeLock();
+                break;
+            }
+            case "hidden":{
+                releaseWakeLock();
+                break;
+            }
+        }   
     }
 
     // Fullscreen
@@ -827,6 +864,12 @@ function HandheldRunner(cart) {
 
         displayNode=document.getElementById("background");
         displayNode.style.backgroundImage="url('"+resourcesPrefix+cart.background+"')";
+
+        if (this.isWakeLock) {
+            document.addEventListener('visibilitychange', onVisibilityChange);
+            document.addEventListener("fullscreenchange", onVisibilityChange);
+            getWakeLock();
+        }
 
         loadAudio(()=>{
             load(resourcesPrefix+cart.case,true,(svg)=>{
