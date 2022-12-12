@@ -540,7 +540,6 @@ const CART_WORLDCHANGERS={
                         }
                     } else if (G.controlIsHit(G.controls.B)) {
                         if (S.playerReloading) {
-                            console.log(S.playerReloadMark,S.playerReloadTarget);
                             if (S.playerReloadMark+1==S.playerReloadTarget) {
                                 G.playSingleAudio(G.audio.fire);
                                 S.ammo=5;
